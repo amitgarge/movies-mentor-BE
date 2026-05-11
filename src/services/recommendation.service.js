@@ -12,6 +12,7 @@ export const getRecommendedMovies = async (query) => {
   if (
     parsedQuery.year ||
     parsedQuery.isHindi ||
+    parsedQuery.isIndian ||
     parsedQuery.isLatest ||
     parsedQuery.genreId
   ) {

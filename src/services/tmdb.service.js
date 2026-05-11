@@ -37,6 +37,19 @@ const requestTMDB = async (path, params = {}) => {
 
 const currentDate = () => new Date().toISOString().split("T")[0];
 
+const dateDaysAgo = (days) => {
+  const date = new Date();
+  date.setDate(date.getDate() - days);
+  return date.toISOString().split("T")[0];
+};
+
+const safeDiscoverParams = {
+  certification_country: "US",
+  "certification.lte": "PG-13",
+  include_adult: false,
+  language: "en-US",
+};
+
 export const searchMovies = async (query, { page = 1 } = {}) => {
   const data = await requestTMDB("/search/movie", {
     query,
@@ -51,40 +64,72 @@ export const searchMovies = async (query, { page = 1 } = {}) => {
 export const discoverMovies = async ({
   year,
   isHindi,
+  isIndian,
   isLatest,
   genreId,
 } = {}) => {
   const data = await requestTMDB("/discover/movie", {
+    include_adult: false,
+    language: "en-US",
     primary_release_year: year,
     with_original_language: isHindi ? "hi" : undefined,
+    with_origin_country: isIndian ? "IN" : undefined,
+    region: isIndian ? "IN" : undefined,
     with_genres: genreId,
     "release_date.lte": currentDate(),
     sort_by: isLatest ? "release_date.desc" : "popularity.desc",
-    include_adult: false,
-    language: "en-US",
     page: 1,
+  });
+
+  return filterValidTMDBMovies(data.results, {
+    originCountry: isIndian ? "IN" : undefined,
+    originalLanguage: isHindi ? "hi" : undefined,
+  });
+};
+
+export const getNowPlayingMovies = async ({ page = 1 } = {}) => {
+  const data = await requestTMDB("/discover/movie", {
+    ...safeDiscoverParams,
+    "primary_release_date.gte": dateDaysAgo(60),
+    "primary_release_date.lte": currentDate(),
+    sort_by: "popularity.desc",
+    page,
   });
 
   return filterValidTMDBMovies(data.results);
 };
 
-export const getNowPlayingMovies = async ({ page = 1 } = {}) => {
-  const data = await requestTMDB("/movie/now_playing", { page, language: "en-US" });
-  return filterValidTMDBMovies(data.results);
-};
-
 export const getPopularMovies = async ({ page = 1 } = {}) => {
-  const data = await requestTMDB("/movie/popular", { page, language: "en-US" });
+  const data = await requestTMDB("/discover/movie", {
+    ...safeDiscoverParams,
+    "release_date.lte": currentDate(),
+    sort_by: "popularity.desc",
+    page,
+  });
+
   return filterValidTMDBMovies(data.results);
 };
 
 export const getTopRatedMovies = async ({ page = 1 } = {}) => {
-  const data = await requestTMDB("/movie/top_rated", { page, language: "en-US" });
+  const data = await requestTMDB("/discover/movie", {
+    ...safeDiscoverParams,
+    "release_date.lte": currentDate(),
+    "vote_count.gte": 300,
+    sort_by: "vote_average.desc",
+    page,
+  });
+
   return filterValidTMDBMovies(data.results);
 };
 
 export const getUpcomingMovies = async ({ page = 1 } = {}) => {
-  const data = await requestTMDB("/movie/upcoming", { page, language: "en-US" });
+  const data = await requestTMDB("/discover/movie", {
+    ...safeDiscoverParams,
+    "primary_release_date.gte": currentDate(),
+    sort_by: "popularity.desc",
+    page,
+  });
+
   return filterValidTMDBMovies(data.results);
 };
 

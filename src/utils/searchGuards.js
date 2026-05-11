@@ -21,6 +21,28 @@ const ADULT_CONTENT_QUERY_PATTERNS = [
   /\bexplicit\s*(content|movie|movies|film|films)?\b/i,
 ];
 
+const UNSAFE_MOVIE_CONTENT_PATTERNS = [
+  /\b18\s*\+?\b/i,
+  /\badult\b/i,
+  /\bafter dark\b/i,
+  /\bbikini\b/i,
+  /\berotic(a)?\b/i,
+  /\bexplicit\b/i,
+  /\bfetish\b/i,
+  /\bhot girls?\b/i,
+  /\bintimate\b/i,
+  /\blust\b/i,
+  /\bnaked\b/i,
+  /\bnude|nudity\b/i,
+  /\bplayboy\b/i,
+  /\bporn(ographic|ography)?\b/i,
+  /\bseduction\b/i,
+  /\bsensual\b/i,
+  /\bsex(ual)?\b/i,
+  /\bstrip(per|tease)?\b/i,
+  /\bxxx\b/i,
+];
+
 const KNOWN_SHORT_TITLES = new Set(["rrr", "up", "us", "it", "her"]);
 
 export const hasAdultContentIntent = (query = "") =>
@@ -97,7 +119,24 @@ export const parseMovieNamesFromAIResponse = (response = "") => {
   return [...new Set(validNames)].slice(0, 5);
 };
 
-export const filterValidTMDBMovies = (movies = []) => {
+export const hasUnsafeMovieContent = (movie = {}) => {
+  const searchableText = [
+    movie.title,
+    movie.original_title,
+    movie.name,
+    movie.original_name,
+    movie.overview,
+    movie.tagline,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  return UNSAFE_MOVIE_CONTENT_PATTERNS.some((pattern) =>
+    pattern.test(searchableText),
+  );
+};
+
+export const filterValidTMDBMovies = (movies = [], filters = {}) => {
   if (!Array.isArray(movies)) return [];
 
   return movies.filter((movie) => {
@@ -108,6 +147,12 @@ export const filterValidTMDBMovies = (movies = []) => {
         title &&
         movie?.poster_path &&
         movie?.adult !== true &&
+        !hasUnsafeMovieContent(movie) &&
+        (!filters.originCountry ||
+          !Array.isArray(movie?.origin_country) ||
+          movie?.origin_country?.includes(filters.originCountry)) &&
+        (!filters.originalLanguage ||
+          movie?.original_language === filters.originalLanguage) &&
         (movie?.release_date ||
           movie?.first_air_date ||
           movie?.media_type !== "tv"),

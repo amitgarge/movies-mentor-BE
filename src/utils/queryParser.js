@@ -20,19 +20,34 @@ export const GENRE_MAP = {
   western: 37,
 };
 
+const GENRE_ALIASES = {
+  funny: "comedy",
+  fun: "comedy",
+  humorous: "comedy",
+  hilarious: "comedy",
+  scary: "horror",
+  suspense: "thriller",
+  romantic: "romance",
+  sci: "science",
+};
+
 export const parseDiscoverQuery = (query = "") => {
   const normalizedQuery = query.toLowerCase();
   let genreId = null;
 
-  Object.keys(GENRE_MAP).forEach((genre) => {
-    if (normalizedQuery.includes(genre)) {
-      genreId = GENRE_MAP[genre];
+  Object.entries({ ...GENRE_MAP, ...GENRE_ALIASES }).forEach(([genre, value]) => {
+    const genrePattern = new RegExp(`\\b${genre}\\b`);
+
+    if (genrePattern.test(normalizedQuery)) {
+      const genreKey = typeof value === "string" ? value : genre;
+      genreId = GENRE_MAP[genreKey];
     }
   });
 
   return {
     year: normalizedQuery.match(/\b(19\d{2}|20\d{2})\b/)?.[0],
-    isHindi: normalizedQuery.includes("hindi"),
+    isHindi: /\b(hindi|bollywood)\b/.test(normalizedQuery),
+    isIndian: /\b(indian|india|bollywood)\b/.test(normalizedQuery),
     isLatest: ["latest", "new", "recent", "current"].some((word) =>
       normalizedQuery.includes(word),
     ),
