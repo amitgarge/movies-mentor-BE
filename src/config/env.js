@@ -8,7 +8,8 @@ dotenv.config();
 export const env = {
   nodeEnv,
   port: process.env.PORT || 3001,
-  host: process.env.HOST || "127.0.0.1",
+  host:
+    process.env.HOST || (nodeEnv === "production" ? "0.0.0.0" : "127.0.0.1"),
   tmdbAccessToken:
     process.env.TMDB_ACCESS_TOKEN ||
     process.env.TMDB_KEY ||
