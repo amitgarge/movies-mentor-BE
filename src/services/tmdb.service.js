@@ -1,8 +1,6 @@
 import { env } from "../config/env.js";
 import { filterValidTMDBMovies } from "../utils/searchGuards.js";
 
-const TMDB_API_BASE_URL = "https://api.themoviedb.org/3";
-
 const requestTMDB = async (path, params = {}) => {
   if (!env.tmdbAccessToken) {
     const error = new Error("TMDB_ACCESS_TOKEN is not configured.");
@@ -10,7 +8,11 @@ const requestTMDB = async (path, params = {}) => {
     throw error;
   }
 
-  const url = new URL(`${TMDB_API_BASE_URL}${path}`);
+  const tmdbBaseUrl = env.tmdbApiBaseUrl.endsWith("/")
+    ? env.tmdbApiBaseUrl
+    : `${env.tmdbApiBaseUrl}/`;
+  const tmdbPath = path.startsWith("/") ? path.slice(1) : path;
+  const url = new URL(tmdbPath, tmdbBaseUrl);
 
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== "") {

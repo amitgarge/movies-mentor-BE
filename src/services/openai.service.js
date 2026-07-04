@@ -1,7 +1,5 @@
 import { env } from "../config/env.js";
 
-const OPENAI_CHAT_COMPLETIONS_URL = "https://api.openai.com/v1/chat/completions";
-
 export const getMovieNamesFromAI = async (query) => {
   if (!env.openAiApiKey) {
     const error = new Error("OPENAI_API_KEY is not configured.");
@@ -9,7 +7,7 @@ export const getMovieNamesFromAI = async (query) => {
     throw error;
   }
 
-  const response = await fetch(OPENAI_CHAT_COMPLETIONS_URL, {
+  const response = await fetch(env.openAiChatCompletionsUrl, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${env.openAiApiKey}`,

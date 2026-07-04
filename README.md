@@ -41,6 +41,8 @@ CORS_ORIGIN=http://localhost:3000
 TMDB_ACCESS_TOKEN=your_tmdb_v4_access_token
 OPENAI_API_KEY=your_openai_api_key
 OPENAI_MODEL=gpt-4o-mini
+TMDB_API_BASE_URL=https://api.themoviedb.org/3
+OPENAI_CHAT_COMPLETIONS_URL=https://api.openai.com/v1/chat/completions
 ```
 
 Supported aliases:
@@ -49,6 +51,8 @@ Supported aliases:
 - `OPEN_AI_KEY` or `REACT_APP_OPEN_AI_KEY` can be used instead of `OPENAI_API_KEY`
 
 Prefer the backend names for new setup.
+
+`TMDB_API_BASE_URL` and `OPENAI_CHAT_COMPLETIONS_URL` have safe defaults in code. Set them only when you need to override the upstream API URLs for a different environment.
 
 ## Getting Started
 

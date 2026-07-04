@@ -14,10 +14,14 @@ export const env = {
     process.env.TMDB_ACCESS_TOKEN ||
     process.env.TMDB_KEY ||
     process.env.REACT_APP_TMDB_KEY,
+  tmdbApiBaseUrl:
+    process.env.TMDB_API_BASE_URL,
   openAiApiKey:
     process.env.OPENAI_API_KEY ||
     process.env.OPENAI_KEY ||
     process.env.OPEN_AI_KEY ||
     process.env.REACT_APP_OPEN_AI_KEY,
   openAiModel: process.env.OPENAI_MODEL || "gpt-4o-mini",
+  openAiChatCompletionsUrl:
+    process.env.OPENAI_CHAT_COMPLETIONS_URL
 };
